@@ -3,16 +3,13 @@
 namespace App\View\Components;
 
 use Illuminate\View\Component;
+use Illuminate\View\View;
 use App\Models\Category;
 use DB;
 
 class AppLayout extends Component
 {
-    /**
-     * Create a new component instance.
-     *
-     * @return void
-     */
+    
     public function __construct(public ?string $metaTitle = null, public ?string $metaDescription = null)
     {
         //
@@ -34,4 +31,5 @@ class AppLayout extends Component
         ->get();
         return view('layouts.app', compact('categories'));
     }
+
 }
