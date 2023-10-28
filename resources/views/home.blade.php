@@ -6,7 +6,7 @@
     @foreach($posts as $post)
         <x-post-item :post="$post"></x-post-item>   
     @endforeach
-
+    <p>ss</p>
     {{$posts->links()}}
 
 </section>
