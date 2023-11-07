@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\Category;
 use App\Models\PostView;
+use DB;
 
 class PostController extends Controller
 {
@@ -15,14 +16,36 @@ class PostController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function home()
     {
-        $posts = Post::query()
-        ->where('active', '=', 1)
+        // Latest post
+        $latestPost = Post::where('active', '=', 1)
         ->whereDate('published_at', '<', Carbon::now())
         ->orderBy('published_at', 'desc')
-        ->paginate(10);
-        return view('home', compact('posts'));
+        ->limit(1)
+        ->first();
+
+        // Show the most popular 3 posts based on upvotes
+        $popularPosts = Post::query()
+        ->leftJoin('upvote_downvotes', 'posts.id', '=', 'upvote_downvotes.post_id')
+        ->select('posts.*', DB::raw('COUNT(upvote_downvotes.id) as upvote_count'))
+        ->where(function($query){
+            $query->whereNull('upvote_downvotes.is_upvote')
+                ->orWhere('upvote_downvotes.is_upvote', '=', 1);
+        })
+        ->where('active', '=', 1)
+        ->whereDate('published_at', '<', Carbon::now())
+        ->orderByDesc('upvote_count')
+        ->groupBy('posts.id')
+        ->limit(3)
+        ->get();
+
+        // If authorized - Show recommended posts based on user upvotes
+        // Not authorized - Popular posts based on views
+
+        // Show recent categories with their latest posts   
+
+        return view('home', compact('latestPost', 'popularPosts'));
     }
 
     /**
