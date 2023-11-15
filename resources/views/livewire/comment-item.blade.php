@@ -5,7 +5,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
         </div>
-        <div>
+        <div class="flex-1">
             <div>
                 <a href="#" class="font-semibold text-indigo-600">{{ $comment->user->name }}</a>
                 - <span class="text-gray-500"> {{ $comment->created_at->diffForHumans() }} </span>
@@ -18,14 +18,26 @@
                 </div> 
             @endif
             <div>
-                <a href="#" class="text-sm text-indigo-600 mr-3">Reply</a>
+                <a wire:click.prevent="startReply" href="#" class="text-sm text-indigo-600 mr-3">Reply</a>
 
                 @if (\Illuminate\Support\Facades\Auth::id() == $comment->user_id )
                 <a wire:click.prevent="startCommentEdit" href="#" class="text-sm text-blue-600 mr-3">Edit</a>
                 <a wire:click.prevent="deleteComment" href="#" class="text-sm text-red-600">Delete</a>
                 @endif
 
+            </div> 
+            @if($replying)
+                <livewire:comment-create :post="$comment->post" :parent-comment="$comment" />  
+            @endif 
+
+            @if($comment->comments->count())
+            <div class="mt-4">
+                @foreach($comment->comments as $childComment)
+                    <livewire:comment-item :comment="$childComment" wire:key="comment-{{$childComment->id}}"/>
+                @endforeach
             </div>
+            @endif
+
         </div>
     </div>
 </div>
