@@ -20,12 +20,12 @@ class PostController extends Controller
     {
         // Latest post
         $latestPost = Post::where('active', '=', 1)
-        ->whereDate('published_at', '<', Carbon::now())
+        // ->whereDate('published_at', '<', Carbon::now())
         ->orderBy('published_at', 'desc')
         ->limit(1)
         ->first();
 
-        // Show the most popular 3 posts based on upvotes
+        // Show the most popular 5 posts based on upvotes
         $popularPosts = Post::query()
         ->leftJoin('upvote_downvotes', 'posts.id', '=', 'upvote_downvotes.post_id')
         ->select('posts.*', DB::raw('COUNT(upvote_downvotes.id) as upvote_count'))
@@ -34,7 +34,7 @@ class PostController extends Controller
                 ->orWhere('upvote_downvotes.is_upvote', '=', 1);
         })
         ->where('active', '=', 1)
-        ->whereDate('published_at', '<', Carbon::now())
+        // ->whereDate('published_at', '<', Carbon::now())
         ->orderByDesc('upvote_count')
         ->groupBy('posts.id')
         ->limit(5)
