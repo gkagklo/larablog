@@ -17,7 +17,7 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-user-add';
+    protected static ?string $navigationIcon = 'heroicon-o-users';
 
     protected static ?string $navigationGroup = 'Users';
 
@@ -34,18 +34,17 @@ class UserResource extends Resource
                     ->maxLength(255),
                 Forms\Components\TextInput::make('password')
                     ->password()
-                    ->required()
                     ->maxLength(255)
                     ->hiddenOn('edit')
+                    ->required()
                     ->visibleOn('create')
                     ->confirmed(),
                 Forms\Components\TextInput::make('password_confirmation')
                     ->password()
-                    ->required()
                     ->maxLength(255)
                     ->hiddenOn('edit')
-                    ->visibleOn('create')
-
+                    ->required()
+                    ->visibleOn('create'),
             ]);
     }
 
@@ -73,14 +72,14 @@ class UserResource extends Resource
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
-    
+
     public static function getRelations(): array
     {
         return [
             //
         ];
     }
-    
+
     public static function getPages(): array
     {
         return [
@@ -89,5 +88,5 @@ class UserResource extends Resource
             'view' => Pages\ViewUser::route('/{record}'),
             'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
-    }    
+    }
 }

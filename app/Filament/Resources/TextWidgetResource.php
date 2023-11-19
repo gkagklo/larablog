@@ -30,9 +30,8 @@ class TextWidgetResource extends Resource
                     ->maxLength(255),
                 Forms\Components\FileUpload::make('image'),
                 Forms\Components\TextInput::make('title')
-                    ->required()
                     ->maxLength(2048),
-                Forms\Components\Textarea::make('content'),
+                Forms\Components\RichEditor::make('content'),
                 Forms\Components\Toggle::make('active')
                     ->required(),
             ])->columns(1);
@@ -43,7 +42,6 @@ class TextWidgetResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('key'),
-                Tables\Columns\TextColumn::make('title'),
                 Tables\Columns\IconColumn::make('active')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('updated_at')
@@ -53,26 +51,29 @@ class TextWidgetResource extends Resource
                 //
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
-    
+
     public static function getRelations(): array
     {
         return [
             //
         ];
     }
-    
+
     public static function getPages(): array
     {
         return [
             'index' => Pages\ListTextWidgets::route('/'),
             'create' => Pages\CreateTextWidget::route('/create'),
+            'view' => Pages\ViewTextWidget::route('/{record}'),
             'edit' => Pages\EditTextWidget::route('/{record}/edit'),
         ];
-    }    
+    }
 }

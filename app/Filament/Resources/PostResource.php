@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PostResource\Pages;
 use App\Filament\Resources\PostResource\RelationManagers;
 use App\Models\Post;
+use Closure;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -12,9 +13,7 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Closure;
 use Illuminate\Support\Str;
-use Filament\Forms\Components\Grid;
 
 class PostResource extends Resource
 {
@@ -28,40 +27,36 @@ class PostResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Card::make()  
-                ->schema([
-                    Grid::make(2)
+                Forms\Components\Card::make()
                     ->schema([
                         Forms\Components\TextInput::make('title')
-                        ->required()
-                        ->maxLength(2048)
-                        ->reactive()
-                        ->afterStateUpdated(function(Closure $set, $state) {
-                            $set('slug', Str::slug($state));
-                        }),
+                            ->required()
+                            ->maxLength(2048)
+                            ->reactive()
+                            ->afterStateUpdated(function (Closure $set, $state) {
+                                $set('slug', Str::slug($state));
+                            }),
                         Forms\Components\TextInput::make('slug')
                             ->required()
                             ->maxLength(2048),
-                    ]), 
-                   
-                    Forms\Components\RichEditor::make('body')
-                        ->required(),
-                        Forms\Components\TextInput::make('meta_title'),
-                        Forms\Components\TextInput::make('meta_description'),
-                    Forms\Components\Toggle::make('active')
-                        ->required(),
-                    Forms\Components\DateTimePicker::make('published_at')
-                ])->columnSpan(8), 
+                        Forms\Components\RichEditor::make('body')
+                            ->required(),
+                        Forms\Components\TextInput::make('meta_title')
+                            ->maxLength(255),
+                        Forms\Components\Textarea::make('meta_description')
+                            ->maxLength(255),
+                        Forms\Components\Toggle::make('active')
+                            ->required(),
+                        Forms\Components\DateTimePicker::make('published_at'),
+                    ])->columnSpan(8),
 
-                Forms\Components\Card::make()  
-                ->schema([
-                     Forms\Components\FileUpload::make('thumbnail'),
-                     Forms\Components\Select::make('category_id')
-                        ->multiple()
-                        ->relationship('categories', 'title')
-                        ->required(),
-                ])->columnSpan(4), 
-                
+                Forms\Components\Card::make()
+                    ->schema([
+                        Forms\Components\FileUpload::make('thumbnail'),
+                        Forms\Components\Select::make('categories')
+                            ->multiple()
+                            ->relationship('categories', 'title'),
+                    ])->columnSpan(4)
             ])->columns(12);
     }
 
@@ -71,11 +66,12 @@ class PostResource extends Resource
             ->columns([
                 Tables\Columns\ImageColumn::make('thumbnail'),
                 Tables\Columns\TextColumn::make('title')->searchable(['title', 'body'])->sortable(),
-                Tables\Columns\IconColumn::make('active')->sortable()
+                Tables\Columns\IconColumn::make('active')
+                    ->sortable()
                     ->boolean(),
-                Tables\Columns\TextColumn::make('published_at')->sortable()
+                Tables\Columns\TextColumn::make('published_at')
+                    ->sortable()
                     ->dateTime(),
-                // Tables\Columns\TextColumn::make('user_id'),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime(),
             ])
@@ -91,21 +87,21 @@ class PostResource extends Resource
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
-    
+
     public static function getRelations(): array
     {
         return [
             //
         ];
     }
-    
+
     public static function getPages(): array
     {
         return [
             'index' => Pages\ListPosts::route('/'),
             'create' => Pages\CreatePost::route('/create'),
-            'edit' => Pages\EditPost::route('/{record}/edit'),
             'view' => Pages\ViewPost::route('/{record}'),
+            'edit' => Pages\EditPost::route('/{record}/edit'),
         ];
-    }    
+    }
 }
